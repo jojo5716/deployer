@@ -23,5 +23,6 @@ function generateConfigFile(credentials, token) {
 module.exports = {
     read,
     apiURL,
-    generateConfigFile
+    generateConfigFile,
+    file
 };

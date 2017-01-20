@@ -18,7 +18,7 @@ function isLogged() {
     return Object.keys(exist).length > 0;
 }
 
-function getCredentials(callback) {
+async function getCredentials(callback) {
     const questions = [
         {
           name: 'username',
@@ -26,9 +26,9 @@ function getCredentials(callback) {
           message: 'Enter your username',
           validate: function( value ) {
             if (value.length) {
-              return true;
+                return true;
             } else {
-              return 'Please enter your username';
+                return 'Please enter your username';
             }
           }
         },
@@ -38,9 +38,9 @@ function getCredentials(callback) {
           message: 'Enter your password:',
           validate: function(value) {
             if (value.length) {
-              return true;
+                return true;
             } else {
-              return 'Please enter your password';
+                return 'Please enter your password';
             }
           }
         }
@@ -55,15 +55,14 @@ async function login() {
         spinner.start();
         process.stdout.write('\n');
 
-        const res =  fetch(`${cfg.apiURL}/login/`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(credentials)
-          },
-          body: credentials
+        const res = fetch(`${cfg.apiURL}/login/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(credentials)
+            },
+            body: credentials
         })
-
         .then((response) => response.json())
         .then((data) => {
             spinner.text = 'Login confirmed!'
@@ -72,19 +71,17 @@ async function login() {
 
             if (data.token) {
                 cfg.generateConfigFile(credentials, data.token);
-                log.ascii(`Welcome ${credentials.username}`);
+                log.success(`Credentials file created in ${cfg.file}`);
+                return credentials.username;
             } else {
-                log.error('Login failed!');
+                log.error(data.message || 'Login failed!');
             }
-
-            process.exit(0);
-
-
-
         })
-
-
     });
+    return null;
 }
 
-login();
+module.exports = {
+    isLogged,
+    login
+};
