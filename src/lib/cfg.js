@@ -1,8 +1,9 @@
-const { homedir } = require('os');
 const path = require('path');
-
+const touch       = require('touch');
+const { homedir } = require('os');
 const fs = require('fs-promise');
-let file = process.env.NOW_JSON ? path.resolve(process.env.NOW_JSON) : path.resolve(homedir(), '.now.json')
+
+let file = process.env.NOW_JSON ? path.resolve(process.env.NOW_JSON) : path.resolve(homedir(), '.deployer.json')
 let apiURL = 'http://127.0.0.1:5000/';
 
 function read() {
@@ -15,7 +16,12 @@ function read() {
     return existing || {}
 }
 
+function generateConfigFile(credentials, token) {
+    fs.writeFileSync(file, JSON.stringify(credentials, null, 2))
+}
+
 module.exports = {
     read,
-    apiURL
+    apiURL,
+    generateConfigFile
 };

@@ -1,4 +1,3 @@
-const chalk = require('chalk');
 const inquirer    = require('inquirer');
 const ora = require('ora')
 const fetch = require('node-fetch')
@@ -7,6 +6,7 @@ const { homedir } = require('os');
 const { validate } = require('email-validator');
 // Internal dependencies
 const cfg = require('./lib/cfg');
+const log = require('./lib/log');
 
 const spinner = ora({
   text: 'Waiting for authentication...',
@@ -51,7 +51,7 @@ function getCredentials(callback) {
 
 async function login() {
 
-    getCredentials((credentials) => {
+    await getCredentials((credentials) => {
         spinner.start();
         process.stdout.write('\n');
 
@@ -69,14 +69,16 @@ async function login() {
             spinner.text = 'Login confirmed!'
             spinner.stopAndPersist('✔');
             process.stdout.write('\n');
-            if (data.token) {
 
+            if (data.token) {
+                cfg.generateConfigFile(credentials, data.token);
+                log.ascii(`Welcome ${credentials.username}`);
             } else {
-                console.log(
-                    chalk.red('Login failed!')
-                );
-                process.exit(0);
+                log.error('Login failed!');
             }
+
+            process.exit(0);
+
 
 
         })

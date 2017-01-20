@@ -15,15 +15,12 @@ const touch       = require('touch');
 const fs          = require('fs');
 const minimist    = require('minimist');
 const { resolve } = require('path');
-const loginService = require('./services/login');
+const authService = require('./services/auth');
+const log         = require('./lib/log');
 
 clear();
 
-console.log(
-  chalk.yellow(
-    figlet.textSync('Deploy', { horizontalLayout: 'full' })
-  )
-);
+log.ascii('Deploy');
 
 const defaultCommand = 'deploy'
 const commands = new Set([
@@ -55,8 +52,11 @@ if (index > -1) {
 
 }
 
-const isLogged = loginService.isLogged();
-if (!isLogged) cmd = 'login';
+const isLogged = authService.isLogged();
+if (!isLogged && cmd !== 'help') {
+    cmd = 'login';
+    log.warning('You are not log in');
+}
 
 console.log(cmd);
 
